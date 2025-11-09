@@ -16,7 +16,7 @@ AI-powered tutoring system with built-in safety guardrails. This FastAPI backend
 
 - **Framework**: FastAPI
 - **Python**: 3.10+
-- **AI/ML**: Google Gemini, OpenAI (for embeddings)
+- **AI/ML**: Google Gemini, OpenAI (for embeddings), scikit-learn (for text vectorization)
 - **Monitoring**: Prometheus metrics
 - **Validation**: Pydantic, JSON Schema
 
@@ -54,7 +54,7 @@ GOOGLE_API_KEY=your_google_api_key
 POLICY_FILE=config/policy.yaml
 AGENT_TIMEOUT_SECONDS=1.0
 CACHE_MAX_ITEMS=1000
-EMBEDDING_PROVIDER=GOOGLE
+EMBEDDING_PROVIDER=SKLEARN
 LLM_PROVIDER=GOOGLE
 LOG_FILE=data/lmguard_audit.json
 HASH_SALT=your-secret-salt-change-in-prod
@@ -161,12 +161,12 @@ Edit `config/policy.yaml` to customize content moderation policies. The policy e
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `OPENAI_KEY` | OpenAI API key for embeddings | Required |
+| `OPENAI_KEY` | OpenAI API key (optional if using SKLEARN) | Optional |
 | `GOOGLE_API_KEY` | Google API key for Gemini | Required |
 | `POLICY_FILE` | Path to policy YAML file | `config/policy.yaml` |
 | `AGENT_TIMEOUT_SECONDS` | Agent decision timeout | `1.0` |
 | `CACHE_MAX_ITEMS` | Maximum cache items | `1000` |
-| `EMBEDDING_PROVIDER` | Embedding provider (OPENAI/GOOGLE/LOCAL) | `GOOGLE` |
+| `EMBEDDING_PROVIDER` | Embedding provider (OPENAI/GOOGLE/SKLEARN) | `SKLEARN` |
 | `LLM_PROVIDER` | LLM provider | `GOOGLE` |
 | `LOG_FILE` | Audit log file path | `/data/lmguard_audit.json` |
 | `HASH_SALT` | Salt for hashing sensitive data | Required |

@@ -19,8 +19,14 @@ class EmbeddingCache:
         return hashlib.sha256(key_str.encode()).hexdigest()
 
     def _cosine_similarity(self, emb1: List[float], emb2: List[float]) -> float:
-        arr1 = np.array(emb1)
-        arr2 = np.array(emb2)
+        """Compute cosine similarity between two embeddings, handling variable lengths."""
+        # Pad shorter vector to match longer one
+        max_len = max(len(emb1), len(emb2))
+        emb1_padded = emb1 + [0.0] * (max_len - len(emb1))
+        emb2_padded = emb2 + [0.0] * (max_len - len(emb2))
+        
+        arr1 = np.array(emb1_padded)
+        arr2 = np.array(emb2_padded)
         denom = (np.linalg.norm(arr1) * np.linalg.norm(arr2)) or 1.0
         return float(np.dot(arr1, arr2) / denom)
 

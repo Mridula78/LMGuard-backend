@@ -9,8 +9,8 @@ class Config:
     POLICY_FILE = os.getenv("POLICY_FILE", "config/policy.yaml")
     AGENT_TIMEOUT_SECONDS = float(os.getenv("AGENT_TIMEOUT_SECONDS", "1.0"))
     CACHE_MAX_ITEMS = int(os.getenv("CACHE_MAX_ITEMS", "1000"))
-    # Providers: OPENAI | GOOGLE | LOCAL
-    EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "GOOGLE")
+    # Providers: OPENAI | GOOGLE | SKLEARN
+    EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "SKLEARN")
     LLM_PROVIDER = os.getenv("LLM_PROVIDER", "GOOGLE")
     LOG_FILE = os.getenv("LOG_FILE", "/data/lmguard_audit.json")
     HASH_SALT = os.getenv("HASH_SALT", "default-salt-change-in-prod")

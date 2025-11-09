@@ -17,7 +17,7 @@ services:
       - key: CACHE_MAX_ITEMS
         value: "1000"
       - key: EMBEDDING_PROVIDER
-        value: GOOGLE
+        value: SKLEARN
       - key: LLM_PROVIDER
         value: GOOGLE
       - key: LOG_FILE

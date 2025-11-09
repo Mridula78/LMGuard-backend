@@ -4,6 +4,8 @@ import jsonschema
 import asyncio
 from typing import Dict, List, Optional
 from datetime import datetime
+from sklearn.feature_extraction.text import TfidfVectorizer
+import numpy as np
 from schemas import AgentDecision
 from deps import config
 from .cache import embedding_cache
@@ -20,12 +22,54 @@ SCHEMA = {
     "required": ["action", "confidence", "explanation"]
 }
 
+# Global TfidfVectorizer instance for scikit-learn embeddings
+_tfidf_vectorizer: Optional[TfidfVectorizer] = None
+_text_corpus: List[str] = []
+
+def _get_or_create_vectorizer() -> TfidfVectorizer:
+    """Get or create the global TfidfVectorizer instance."""
+    global _tfidf_vectorizer
+    if _tfidf_vectorizer is None:
+        _tfidf_vectorizer = TfidfVectorizer(
+            max_features=5000,
+            ngram_range=(1, 2),
+            min_df=1,
+            lowercase=True,
+            stop_words='english'
+        )
+    return _tfidf_vectorizer
+
 async def _get_embedding(text: str) -> Optional[List[float]]:
     """
-    Get embedding for text (async).
+    Get embedding for text using scikit-learn's TfidfVectorizer or API providers.
     Returns None on failure - cache will skip caching for this request.
     """
-    if config.EMBEDDING_PROVIDER == "GOOGLE" and config.GOOGLE_API_KEY:
+    if config.EMBEDDING_PROVIDER == "SKLEARN":
+        try:
+            vectorizer = _get_or_create_vectorizer()
+            global _text_corpus
+            
+            # Add text to corpus if not already present
+            needs_refit = text not in _text_corpus
+            if needs_refit:
+                _text_corpus.append(text)
+                # Refit vectorizer with updated corpus to maintain vocabulary
+                # Note: This means embeddings may change as corpus grows, but TF-IDF requires full corpus
+                vectorizer.fit(_text_corpus)
+            
+            # Transform text to TF-IDF vector
+            vector = vectorizer.transform([text])
+            
+            # Convert sparse matrix to dense array and then to list
+            dense_vector = vector.toarray()[0]
+            embedding = dense_vector.tolist()
+            
+            return embedding
+        except Exception as e:
+            print(f"[embedding] Scikit-learn error: {e}")
+            return None
+    
+    elif config.EMBEDDING_PROVIDER == "GOOGLE" and config.GOOGLE_API_KEY:
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
                 resp = await client.post(
