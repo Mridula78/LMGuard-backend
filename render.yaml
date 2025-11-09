@@ -2,22 +2,29 @@ services:
   - type: web
     name: lmguard-backend
     env: python
+    region: oregon
+    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT --workers 1
+    healthCheckPath: /health
     envVars:
-      - key: OPENAI_KEY
+      - key: GOOGLE_API_KEY
         sync: false
       - key: POLICY_FILE
-        value: /app/config/policy.yaml
+        value: config/policy.yaml
       - key: AGENT_TIMEOUT_SECONDS
-        value: 1.0
+        value: "1.0"
       - key: CACHE_MAX_ITEMS
-        value: 1000
+        value: "1000"
       - key: EMBEDDING_PROVIDER
-        value: OPENAI
+        value: GOOGLE
+      - key: LLM_PROVIDER
+        value: GOOGLE
       - key: LOG_FILE
-        value: /data/lmguard_audit.json
+        value: /tmp/lmguard_audit.json
       - key: HASH_SALT
         generateValue: true
-
-
+      - key: ADMIN_TOKEN
+        generateValue: true
+      - key: ALLOWED_ORIGINS
+        value: "*"
