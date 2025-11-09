@@ -66,7 +66,7 @@ app.add_middleware(
 )
 
 
-@app.get("/health", response_model=HealthResponse)
+@app.get("/", response_model=HealthResponse)
 async def health_check():
     """Health check endpoint."""
     return {"status": "ok"}
